@@ -1,13 +1,13 @@
 (deffacts robot
-    (lineaPedido palet naranjas 0 palet manzanas 0 palet caquis 0 palet uva 0 almacen palet naranjas 5 palet manzanas 4 palet caquis 2 palet uva 2)
+    (lineaPedido palet naranjas 0 palet manzanas 0 palet caquis 0 palet uva 0 almacen palet naranjas 10 palet manzanas 4 palet caquis 2 palet uva 2)
     (pedido palet naranjas 2 palet manzanas 2 palet caquis 0 palet uva 1)
     (transporte 3)
 )
 
 (defrule acabar
     (declare (salience 150))
-    (lineaPedido naranjas ?naranjas manzanas ?manzanas caquis ?caquis uva ?uva almacen $?almacen)
-    (pedido naranjas ?naranjas manzanas ?manzanas caquis ?caquis uva ?uva)
+    (lineaPedido palet naranjas ?naranjas palet manzanas ?manzanas palet caquis ?caquis palet uva ?uva almacen $?almacen)
+    (pedido palet naranjas ?naranjas palet manzanas ?manzanas palet caquis ?caquis palet uva ?uva)
     =>
     (printout t "He acabado" crlf)
     (halt)
@@ -16,32 +16,32 @@
 
 (defrule mover_unPoco
     (declare (salience 120))
-    (lineaPedido $?preLinea palet ?fruta ?frutaLinea $?postLinea almacen naranjas ?naranjasA manzanas ?manzanasA caquis ?caquisA uva ?uvaA)
+    (lineaPedido $?preLinea palet ?fruta ?frutaLinea $?postLinea almacen $?preA palet ?fruta ?frutaA $?postA)
     (pedido $?preP palet ?fruta ?frutaP $?postP)
     (transporte ?numeroTransporte)
-    (test (and (>(+ ?naranjas ?naranjasA) ?naranjasP)  (>(+ ?manzanas ?manzanasA) ?manzanasP) (>(+ ?caquis ?caquisA) ?caquisP) (>(+ ?uva ?uvaA) ?uvaP)))
-    (test (> ?numeroTransporte ?naranjasP))
-    (test (<> ?naranjas ?naranjasP))
+    (test (>(+ ?frutaLinea ?frutaA) ?frutaP))
+    (test (> ?numeroTransporte ?frutaP))
+    (test (<> ?frutaLinea ?frutaP))
     =>
-    (assert(lineaPedido naranjas ?naranjasP manzanas ?manzanas caquis ?caquis uva ?uva almacen naranjas (- ?naranjasA ?naranjasP) manzanas ?manzanasA caquis ?caquisA uva ?uvaA))
+    (assert(lineaPedido $?preLinea palet ?fruta (+ ?frutaLinea ?frutaP) $?postLinea almacen $?preA palet ?fruta (- ?frutaA ?frutaP) $?postA))
 )
 
-(defrule mover_todo
+(defrule mover_unPoco
     (declare (salience 120))
-    (lineaPedido naranjas ?naranjas manzanas ?manzanas caquis ?caquis uva ?uva almacen naranjas ?naranjasA manzanas ?manzanasA caquis ?caquisA uva ?uvaA)
-    (pedido naranjas ?naranjasP manzanas ?manzanasP caquis ?caquisP uva ?uvaP)
+    (lineaPedido $?preLinea palet ?fruta ?frutaLinea $?postLinea almacen $?preA palet ?fruta ?frutaA $?postA)
+    (pedido $?preP palet ?fruta ?frutaP $?postP)
     (transporte ?numeroTransporte)
-    (test (and (>(+ ?naranjas ?naranjasA) ?naranjasP)  (>(+ ?manzanas ?manzanasA) ?manzanasP) (>(+ ?caquis ?caquisA) ?caquisP) (>(+ ?uva ?uvaA) ?uvaP)))
-    (test (< ?numeroTransporte ?naranjasP))
-    (test (<> ?naranjas ?naranjasP))
+    (test (>(+ ?frutaLinea ?frutaA) ?frutaP))
+    (test (< ?numeroTransporte ?frutaP))
+    (test (<> ?frutaLinea ?frutaP))
     =>
-    (assert(lineaPedido naranjas (+ ?naranjas ?numeroTransporte) manzanas ?manzanas caquis ?caquis uva ?uva almacen naranjas (- ?naranjasA ?numeroTransporte) manzanas ?manzanasA caquis ?caquisA uva ?uvaA))
+    (assert(lineaPedido $?preLinea palet ?fruta (+ ?frutaLinea ?numeroTransporte) $?postLinea almacen $?preA palet ?fruta (- ?frutaA ?numeroTransporte) $?postA))
 )
 
 (defrule acabar2
     (declare (salience 100))
-    (lineaPedido naranjas ?naranjas manzanas ?manzanas caquis ?caquis uva ?uva almacen $?almacen)
-    (not(pedido naranjas ?naranjas manzanas ?manzanas caquis ?caquis uva ?uva))
+    (lineaPedido palet naranjas ?naranjas palet manzanas ?manzanas palet caquis ?caquis palet uva ?uva almacen $?almacen)
+    (not(pedido palet naranjas ?naranjas palet manzanas ?manzanas palet caquis ?caquis palet uva ?uva))
     
     =>
     (printout t "No hay existencias" crlf)
